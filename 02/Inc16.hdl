@@ -1,0 +1,99 @@
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/02/Inc16.hdl
+
+/**
+ * 16-bit incrementer:
+ * out = in + 1 (arithmetic addition)
+ */
+
+CHIP Inc16 {
+    IN in[16];
+    OUT out[16];
+
+    PARTS:
+    /**
+     * This is better than Add16. Each FullAdder (Mux, 2x Xor, 2x And) is 
+     * replaced with Not, Mux, Xor, And. So Not for Xor and And.
+     *
+     * However, not sure if this is optimal.
+     */
+    Not (in=in[0], out=n0);
+    Not (in=in[0], out=out[0]);
+    And (a=in[0], b=n0, out=zero);
+    Xor (a=in[0], b=zero, out=shouldflip1);
+
+    Not (in=in[1], out=n1);
+    Mux (a=in[1], b=n1, sel=shouldflip1, out=out[1]);
+    Xor (a=in[1], b=zero, out=nz1);
+    And (a=shouldflip1, b=nz1, out=shouldflip2);
+
+    Not (in=in[2], out=n2);
+    Mux (a=in[2], b=n2, sel=shouldflip2, out=out[2]);
+    Xor (a=in[2], b=zero, out=nz2);
+    And (a=shouldflip2, b=nz2, out=shouldflip3);
+
+    Not (in=in[3], out=n3);
+    Mux (a=in[3], b=n3, sel=shouldflip3, out=out[3]);
+    Xor (a=in[3], b=zero, out=nz3);
+    And (a=shouldflip3, b=nz3, out=shouldflip4);
+
+    Not (in=in[4], out=n4);
+    Mux (a=in[4], b=n4, sel=shouldflip4, out=out[4]);
+    Xor (a=in[4], b=zero, out=nz4);
+    And (a=shouldflip4, b=nz4, out=shouldflip5);
+
+    Not (in=in[5], out=n5);
+    Mux (a=in[5], b=n5, sel=shouldflip5, out=out[5]);
+    Xor (a=in[5], b=zero, out=nz5);
+    And (a=shouldflip5, b=nz5, out=shouldflip6);
+
+    Not (in=in[6], out=n6);
+    Mux (a=in[6], b=n6, sel=shouldflip6, out=out[6]);
+    Xor (a=in[6], b=zero, out=nz6);
+    And (a=shouldflip6, b=nz6, out=shouldflip7);
+
+    Not (in=in[7], out=n7);
+    Mux (a=in[7], b=n7, sel=shouldflip7, out=out[7]);
+    Xor (a=in[7], b=zero, out=nz7);
+    And (a=shouldflip7, b=nz7, out=shouldflip8);
+
+    Not (in=in[8], out=n8);
+    Mux (a=in[8], b=n8, sel=shouldflip8, out=out[8]);
+    Xor (a=in[8], b=zero, out=nz8);
+    And (a=shouldflip8, b=nz8, out=shouldflip9);
+
+    Not (in=in[9], out=n9);
+    Mux (a=in[9], b=n9, sel=shouldflip9, out=out[9]);
+    Xor (a=in[9], b=zero, out=nz9);
+    And (a=shouldflip9, b=nz9, out=shouldflip10);
+
+    Not (in=in[10], out=n10);
+    Mux (a=in[10], b=n10, sel=shouldflip10, out=out[10]);
+    Xor (a=in[10], b=zero, out=nz10);
+    And (a=shouldflip10, b=nz10, out=shouldflip11);
+
+    Not (in=in[11], out=n11);
+    Mux (a=in[11], b=n11, sel=shouldflip11, out=out[11]);
+    Xor (a=in[11], b=zero, out=nz11);
+    And (a=shouldflip11, b=nz11, out=shouldflip12);
+
+    Not (in=in[12], out=n12);
+    Mux (a=in[12], b=n12, sel=shouldflip12, out=out[12]);
+    Xor (a=in[12], b=zero, out=nz12);
+    And (a=shouldflip12, b=nz12, out=shouldflip13);
+
+    Not (in=in[13], out=n13);
+    Mux (a=in[13], b=n13, sel=shouldflip13, out=out[13]);
+    Xor (a=in[13], b=zero, out=nz13);
+    And (a=shouldflip13, b=nz13, out=shouldflip14);
+
+    Not (in=in[14], out=n14);
+    Mux (a=in[14], b=n14, sel=shouldflip14, out=out[14]);
+    Xor (a=in[14], b=zero, out=nz14);
+    And (a=shouldflip14, b=nz14, out=shouldflip15);
+
+    Not (in=in[15], out=n15);
+    Mux (a=in[15], b=n15, sel=shouldflip15, out=out[15]);
+}
