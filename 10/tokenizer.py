@@ -24,7 +24,7 @@ class JackTokenizer():
     }
 
     def __init__(self, infile):
-        self.curr = -1
+        self.idx = -1
 
         with open (infile, 'r') as f:
             self.rawfile = f.read()
@@ -49,7 +49,7 @@ class JackTokenizer():
             symbolcopy.append('\-')
 
             regexes = [
-                # string constant (preserve surrounding quotes)
+                # string constant (keep surrounding quotes)
                 r"\s*(\".*?\")",
                 # integer constant
                 r"\s*(\d+)",
@@ -63,7 +63,7 @@ class JackTokenizer():
                 match = re.match(regex, self.rawfile[i:])
                 if match:
                     self.tokens.append(match.group(1))
-                    i += match.end(1)
+                    i += match.end(0)
                     break
             
             # couldn't match anything -> exit
@@ -75,17 +75,19 @@ class JackTokenizer():
 
 
     def hasMoreTokens(self) -> bool:
-        """Are there more tokens in the input?"""
-        return len(self.tokens) != 0 and self.curr < len(self.tokens)
+        """Are there more tokens in the input, including the current one?"""
+        return len(self.tokens) != 0 and self.idx < len(self.tokens)
 
     def advance(self):
         """Move to the next token. Initially there is no current
         token."""
-        self.curr += 1
+        if not self.hasMoreTokens():
+            raise Exception("Can't advance: no more tokens!")
+        self.idx += 1
 
-    def tokenType(self) -> TokenType:
+    def getTokenType(self) -> TokenType:
         """Return the type of the current token."""
-        t = self.tokens[self.curr]
+        t = self.tokens[self.idx]
         if t in self.SYMBOLS:
             return TokenType.SYMBOL
         elif t in self.KEYWORDS:
@@ -97,23 +99,10 @@ class JackTokenizer():
         else:
             return TokenType.IDENTIFIER
 
-    def keyword(self) -> str:
-        """When the current token is a keyword, return its value.""" 
-        return self.tokens[self.curr]
-
-    def symbol(self) -> str:
-        """When the current token is a symbol, return its value."""
-        return self.tokens[self.curr]
-
-    def identifier(self) -> str:
-        """When the current token is an identifier, return its value."""
-        return self.tokens[self.curr]
-
-    def intVal(self) -> int:
-        """When the current token is an integer constant, return its value."""
-        return self.tokens[self.curr]
-
-    def stringVal(self) -> str:
-        """When current token is a string constant, return its value without
-        the surrounding double quotes."""
-        return self.tokens[self.curr][1:-1]
+    def getToken(self) -> str:
+        """Return the current token as a string. Note: string constants have
+        their surrounding quotes omitted."""
+        if self.getTokenType() == TokenType.STRING_CONST:
+            # strip quotation marks.
+            return self.tokens[self.idx][1:-1]
+        return self.tokens[self.idx]

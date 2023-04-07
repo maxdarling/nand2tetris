@@ -30,27 +30,21 @@ def analyze(source: str):
         t = JackTokenizer(files[i])
         t.advance()
         while t.hasMoreTokens():
-            tokenType = t.tokenType()
+            tokenType = t.getTokenType()
             tagstr = None # temp, for testing
-            token = None
+            token = t.getToken()
             if tokenType == TokenType.KEYWORD:
-                token = t.keyword()
                 tagstr = 'keyword'
             elif tokenType == TokenType.SYMBOL:
-                token = t.symbol()
                 symbol_conv = { '<' : '&lt;', '>' : '&gt;', '"' : '&quot;', '&' : '&amp;'}
                 if token in symbol_conv:
                     token = symbol_conv[token]
                 tagstr = 'symbol'
             elif tokenType == TokenType.IDENTIFIER:
-                token = t.identifier()
                 tagstr = 'identifier'
             elif tokenType == TokenType.INT_CONST:
-                token = t.intVal()
                 tagstr = 'integerConstant'
             else:
-                # todo: remove surrounding quotes??
-                token = t.stringVal()
                 tagstr = 'stringConstant'
 
             res = f"<{tagstr}> {token} </{tagstr}>"
