@@ -24,8 +24,6 @@ class JackTokenizer():
     }
 
     def __init__(self, infile):
-        self.idx = -1
-
         with open (infile, 'r') as f:
             self.rawfile = f.read()
 
@@ -37,27 +35,23 @@ class JackTokenizer():
         # trim whitespace
         self.rawfile = self.rawfile.strip()
 
-        # tokenization algorithm: iteratively match regexes for tokens while skipping whitespace.
         self.tokens = []
+        self.idx = -1
+
+        regexes = [
+            # string constant (keep surrounding quotes)
+            r"\s*(\".*?\")",
+            # integer constant
+            r"\s*(\d+)",
+            # symbols
+            rf"\s*([{re.escape(''.join(self.SYMBOLS))}])",
+            # keyword / identifier
+            r"\s*([a-zA-Z_][a-zA-Z_0-9]*)",
+        ]
+
+        # tokenization algorithm: iteratively match regexes for tokens while skipping whitespace.
         i = 0
         while True:
-            # escape symbols 
-            symbolcopy = [s for s in self.SYMBOLS] 
-            symbolcopy.remove(']')
-            symbolcopy.append('\]')
-            symbolcopy.remove('-')
-            symbolcopy.append('\-')
-
-            regexes = [
-                # string constant (keep surrounding quotes)
-                r"\s*(\".*?\")",
-                # integer constant
-                r"\s*(\d+)",
-                # symbols
-                rf"\s*([{''.join(symbolcopy)}])",
-                # keyword / identifier
-                r"\s*([a-zA-Z_][a-zA-Z_0-9]*)",
-            ]
             match = None
             for regex in regexes:
                 match = re.match(regex, self.rawfile[i:])
@@ -66,12 +60,11 @@ class JackTokenizer():
                     i += match.end(0)
                     break
             
-            # couldn't match anything -> exit
             if not match:
                 break
 
         # sanity check - did we scan the whole file?
-        assert(len(self.rawfile[i:]) == 0)
+        assert(i == len(self.rawfile))
 
 
     def hasMoreTokens(self) -> bool:
@@ -103,6 +96,5 @@ class JackTokenizer():
         """Return the current token as a string. Note: string constants have
         their surrounding quotes omitted."""
         if self.getTokenType() == TokenType.STRING_CONST:
-            # strip quotation marks.
             return self.tokens[self.idx][1:-1]
         return self.tokens[self.idx]
