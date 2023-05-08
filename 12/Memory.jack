@@ -1,0 +1,139 @@
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/12/Memory.jack
+
+/**
+ * This library provides two services: direct access to the computer's main
+ * memory (RAM), and allocation and recycling of memory blocks. The Hack RAM
+ * consists of 32,768 words, each holding a 16-bit binary number.
+ */
+class Memory {
+    /**
+     * Implementaiton notes: this was hard. I don't have the appetite to debug
+     * with the VM emulator right now, so I'm just using the trivial allocation
+     * scheme with a no-op deallocation. My main attempt at alloc/dealloc was
+     * buggy (passed tests, but not pong game). They're commented out below.
+     */
+    static Array memory; // hack for indexing memory.
+    static int freeList;
+    static int heapBase;
+    static int kHeapLen;
+
+    static int kHeaderSize; // 3 metadata fields for each node/block, see below.
+    static int kHeaderOffsetLength;
+    static int kHeaderOffsetBlockType;
+    static int kHeaderOffsetNext;
+    static int kBlockTypeFreelist;
+    static int kBlockTypeAllocated;
+
+
+    /**
+     * +--------------------------------+--------------------------------+
+     * |         freelist node          |        allocated block         |
+     * +--------------------------------+--------------------------------+
+     * | 'length'                       | 'length'                       |
+     * | 'is_node' (true)               | 'is_node' (false)              |
+     * | 'next' pointer                 | <empty word for allignment>    |
+     * | ...<'length' bytes of data>... | ...<'length' bytes of data>... |
+     * +--------------------------------+--------------------------------+
+     */
+
+    /** Initializes the class. */
+    function void init() {
+        let memory = 0;
+        let heapBase = 2048;
+        let freeList = heapBase;
+        let kHeapLen = 14436; // [2048, 16484)
+
+        // let kHeaderSize = 3;
+        // let kHeaderOffsetLength = 0;
+        // let kHeaderOffsetBlockType = 1;
+        // let kHeaderOffsetNext = 2;
+        // let kBlockTypeFreelist = 1;
+        // let kBlockTypeAllocated = 2;
+
+        // // init first freelist node
+        // let memory[heapBase + kHeaderOffsetLength] = kHeapLen - kHeaderSize;
+        // let memory[heapBase + kHeaderOffsetBlockType] = kBlockTypeFreelist;
+        // let memory[heapBase + kHeaderOffsetNext] = 0;
+        return;
+    }
+
+    /** Returns the RAM value at the given address. */
+    function int peek(int address) {
+        return memory[address];
+    }
+
+    /** Sets the RAM value at the given address to the given value. */
+    function void poke(int address, int value) {
+        let memory[address] = value;
+        return;
+    }
+
+    /** Finds an available RAM block of the given size and returns
+     *  a reference to its base address. */
+    function int alloc(int size) {
+        var int blockAddr;
+        let blockAddr = freeList;
+        let freeList = freeList + size;
+        return blockAddr;
+        // var int curr, blockAddr;
+
+        // // first-fit allocation: walk the free list until we find enough space.
+        // let curr = freeList;
+        // while (memory[curr + kHeaderOffsetLength] < (size + kHeaderSize)) {
+        //     let curr = memory[curr + kHeaderOffsetNext];
+        //     if (curr = 0) {
+        //         do Sys.error(3); // no more nodes - out of memory.
+        //     }
+        // }
+
+        // // point to beginning of new block. set header fields.
+        // let blockAddr = curr + memory[curr + kHeaderOffsetLength] - size;
+        // let memory[blockAddr + kHeaderOffsetLength] = size;
+        // let memory[blockAddr + kHeaderOffsetBlockType] = kBlockTypeAllocated;
+
+        // // update freelist node.
+        // let memory[curr + kHeaderOffsetLength] =
+        //     memory[curr + kHeaderOffsetLength] - (size + kHeaderSize);
+
+        // return blockAddr + kHeaderSize;
+    }
+
+    /** De-allocates the given object (cast as an array) by making
+     *  it available for future allocations. */
+    function void deAlloc(Array o) {
+        // var int nodeAddr, curr;
+
+        // // convert block into a freelist node
+        // let nodeAddr = o - kHeaderSize;
+        // let memory[nodeAddr + kHeaderOffsetBlockType] = kBlockTypeFreelist;
+        // let memory[nodeAddr + kHeaderOffsetNext] = 0;
+
+        // // append new node to the end of the freelist.
+        // let curr = freeList;
+        // while (~(memory[curr + kHeaderOffsetNext] = 0)){
+        //     let curr = memory[curr + kHeaderOffsetNext];
+        // }
+        // let memory[curr + kHeaderOffsetNext] = nodeAddr;
+
+        // // last, do defrag.
+        // do Memory.defrag();
+
+        return;
+    }
+
+    /**
+     * ~~~~~~~~~~~~~~~~~~~~~~~~~
+     * ~~  Private Functions  ~~
+     * ~~~~~~~~~~~~~~~~~~~~~~~~~
+     */
+
+
+    /** Defragments the heap. */
+    function void defrag() {
+        // future todo
+        return;
+    }
+}
